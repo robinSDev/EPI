@@ -1,0 +1,6 @@
+C:\Users\Robin Singh\Documents\EPI\ch5\5-3.cxx: In function 'void cacheFileToMap(std::__cxx11::string)':
+C:\Users\Robin Singh\Documents\EPI\ch5\5-3.cxx:36:14: error: 'std' is not a member of 'std'
+         std::std
+              ^~~
+C:\Users\Robin Singh\Documents\EPI\ch5\5-3.cxx:36:14: note: suggested alternative:
+<built-in>: note:   'std'
