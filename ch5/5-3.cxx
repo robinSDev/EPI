@@ -11,22 +11,22 @@
 unsigned long long reverse_kBits_Unsigned (unsigned long long x, const unsigned k);
 long long reverse_kBits_Signed (long long x, const unsigned k);
 //Creating 16 bit Cache:
-void calc_16Bit_reverse(const unsigned x);
-void cacheFileToArray(std::string fileName);
-void printCache();
-
+void calc_16Bit_reverse_cache_file(const unsigned x, const std::string &fileName);
+void load_cache_to_array(std::string fileName);
+void print_array();
 //Use 16 bit cache to reverse 64 unsigned
 unsigned long long reverse64Bit_with_16bitCache(unsigned long long x);
 
-//Loading the cache on secondary memory to primary memory as a map
+//Loading the cache from secondary memory to primary memory as an array
 std::array<unsigned long long, 1 << 16> precomputed_reverse;
 
 int main ()
 {
     //std::cout << std::bitset<32>(1<<16);
-    //calc_16Bit_reverse(1<<16);
-    cacheFileToArray("16bitReverse.txt");
-    //printCache();
+    std::string fileName = "16bitReverse.txt";
+    //calc_16Bit_reverse_cache_file(1<<16, fileName);
+    load_cache_to_array(fileName);
+    //print_array();
     unsigned long long x, y = 929999;
     x = reverse_kBits_Unsigned(y, 64);
     std::cout << DNB(x) << std::endl;
@@ -40,16 +40,16 @@ int main ()
 //Use 16 bit cache to reverse 64 unsigned
 unsigned long long reverse64Bit_with_16bitCache(unsigned long long x)
 {
-    const int kMaskSize = 16;
+    const int kWordSize = 16;
     const int kBitMask = 0xFFFF;
-    return  precomputed_reverse[x & kBitMask] << (3 * kMaskSize) |
-            precomputed_reverse[(x >> kMaskSize) & kBitMask] << (2 * kMaskSize) |
-            precomputed_reverse[(x >> (2 * kMaskSize)) & kBitMask] << kMaskSize |
-            precomputed_reverse[(x >> (3 * kMaskSize)) & kBitMask];
+    return  precomputed_reverse[x & kBitMask] << (3 * kWordSize) |
+            precomputed_reverse[(x >> kWordSize) & kBitMask] << (2 * kWordSize) |
+            precomputed_reverse[(x >> (2 * kWordSize)) & kBitMask] << kWordSize |
+            precomputed_reverse[(x >> (3 * kWordSize)) & kBitMask];
 }
 
 //Read cache file and store it in the global array
-void cacheFileToArray(std::string fileName)
+void load_cache_to_array(std::string fileName)
 {
     std::ifstream ipf(fileName);
     if(!ipf.is_open()) {
@@ -73,17 +73,17 @@ void cacheFileToArray(std::string fileName)
 }
 
 //print array created from cache
-void printCache()
+void print_array()
 {
     for(const auto &elem : precomputed_reverse)
         std::cout << elem << "\n";
 }
 
 //create a file and save all 16 bit numbers and its reverse
-void calc_16Bit_reverse(const unsigned x)
+void calc_16Bit_reverse_cache_file(const unsigned x, const std::string &fileName)
 {
     std::cout << "Creating file of reverse of bits of each of the 16 bit numbers\n";
-    std::ofstream o("16bitReverse.txt");
+    std::ofstream o(fileName);
     for (unsigned i = 0; i < x; i++) {
         o << reverse_kBits_Unsigned(i, 16) << "\n";
     }
