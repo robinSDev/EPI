@@ -1,128 +1,122 @@
-#include <bits/stdc++.h>
-#define USL unsigned long
-#define US unsigned
-#define BS16 (std::bitset<16>)
-#define DNB(a) std::setw(10) << (a) << " : " << std::bitset<64>(a)
-using namespace std;
+#include<iostream>
+#include<bitset>
+#include<fstream> //ofstream and ifstream
+#include<iomanip>//setw
+#include<unordered_map>
+#include<array>
 
-unsigned long long reverseBitsUnsigned (unsigned long long x);
-unsigned reverse16BitUnsignedImproved (unsigned x);
-long long reverseBits (long long x);
-long long reverseBitsImproved (long long x);
+#define DNB(a) std::setw(10) << (a) << " : " << std::bitset<64>(a)
+
+//Reverse k bits
+unsigned long long reverse_kBits_Unsigned (unsigned long long x, const unsigned k);
+long long reverse_kBits_Signed (long long x, const unsigned k);
+//Creating 16 bit Cache:
 void calc_16Bit_reverse(const unsigned x);
-void cacheFileToMap(string fileName);
-void printMap();
-std::unordered_map<std::bitset<16>, std::bitset<16>> m;
+void cacheFileToArray(std::string fileName);
+void printCache();
+
+//Use 16 bit cache to reverse 64 unsigned
+unsigned long long reverse64Bit_with_16bitCache(unsigned long long x);
+
+//Loading the cache on secondary memory to primary memory as a map
+std::array<unsigned long long, 1 << 16> precomputed_reverse;
 
 int main ()
 {
-    /*unsigned long long x = 929999;
-    cout << DNB(x) << endl;
-    x = reverseBits(x);
-    cout << DNB(x) << endl;
-    x = reverseBitsImproved(929999);
-    cout << DNB(x) << endl;
-    */
-    //calc_16Bit_reverse(pow(2,16));
-    //cacheFileToMap("16bitReverseBitSet.txt");
-    bitset<16>("0000000000000111");
-    //printMap();
+    //std::cout << std::bitset<32>(1<<16);
+    //calc_16Bit_reverse(1<<16);
+    cacheFileToArray("16bitReverse.txt");
+    //printCache();
+    unsigned long long x, y = 929999;
+    x = reverse_kBits_Unsigned(y, 64);
+    std::cout << DNB(x) << std::endl;
+    
+    x = reverse64Bit_with_16bitCache(y);
+    std::cout << DNB(x) << std::endl;
+    
     return 0;
 }
-/*TODO & PUSH TO GIT */
-void cacheFileToMap(string fileName)
+
+//Use 16 bit cache to reverse 64 unsigned
+unsigned long long reverse64Bit_with_16bitCache(unsigned long long x)
+{
+    const int kMaskSize = 16;
+    const int kBitMask = 0xFFFF;
+    return  precomputed_reverse[x & kBitMask] << (3 * kMaskSize) |
+            precomputed_reverse[(x >> kMaskSize) & kBitMask] << (2 * kMaskSize) |
+            precomputed_reverse[(x >> (2 * kMaskSize)) & kBitMask] << kMaskSize |
+            precomputed_reverse[(x >> (3 * kMaskSize)) & kBitMask];
+}
+
+//Read cache file and store it in the global array
+void cacheFileToArray(std::string fileName)
 {
     std::ifstream ipf(fileName);
-    if(!ipf.is_open())
-        std::cout << "Error opening file";
-    string sn, sr;
+    if(!ipf.is_open()) {
+        std::cout << "Error opening file, map not created. Returning function call";
+        return;
+    }
+        
+    std::string sr;
+    unsigned i = 0;
     while(ipf.good()) {
-        getline(ipf, sn, ',');
-        getline(ipf, sr, '\n');
-        bitset<16> bn = bitset<16>(sn);
-        bitset<16> br = bitset<16>(sr);
-        m[bn] = br;
+        std::getline(ipf, sr, '\n');
+        unsigned long long reverse;
+        if (sr != "")
+        {
+            reverse = std::stoull(sr, nullptr, 10);
+            precomputed_reverse[i] = reverse;
+        }
+        ++i;
     }
     ipf.close();
 }
 
-void printMap()
+//print array created from cache
+void printCache()
 {
-    for(auto &elem : m)
-    {
-        std::cout << elem.first << " " << elem.second << "\n";
-    }
+    for(const auto &elem : precomputed_reverse)
+        std::cout << elem << "\n";
 }
 
 //create a file and save all 16 bit numbers and its reverse
 void calc_16Bit_reverse(const unsigned x)
 {
-    ofstream o("16bitReverse.txt");
+    std::cout << "Creating file of reverse of bits of each of the 16 bit numbers\n";
+    std::ofstream o("16bitReverse.txt");
     for (unsigned i = 0; i < x; i++) {
-        o << i << "," << reverse16BitUnsignedImproved(i) << "\n";
+        o << reverse_kBits_Unsigned(i, 16) << "\n";
     }
+    std::cout << "..Done";
 }
 
-unsigned reverse16BitUnsignedImproved (unsigned x)
+//UNSIGNED VERSION : CREATING ONE MASK THEN XOR WITH X
+unsigned long long reverse_kBits_Unsigned (unsigned long long x, const unsigned k)
 {
-    unsigned mask = 0;
-    for(unsigned i = 0, j = 15; i < j; ++i, --j)
+    unsigned long long mask = 0;
+    for(unsigned i = 0, j = k-1; i < j; ++i, --j)
     {
         if ( (x>>i & 1) != (x>>j & 1))
         {
-            mask |= (1<<i) | (1<<j);
+            mask |= (1ULL<<i) | (1ULL<<j);
         }
     }
     x ^= mask;
     return x;
 }
-// UNSIGNED VERSION
-unsigned long long reverseBitsUnsigned (unsigned long long x)
-{
-    for(unsigned i = 0, j = 63; i < j; ++i, --j)
-    {
-        cout << i << " " << j << endl;
-        if ( (x>>i & 1) != (x>>j & 1))
-        {
-            unsigned long long mask = (1LL<<i) | (1LL<<j);
-            cout << "   " << DNB(mask) << endl ;
-            x ^= mask;
-            //cout << "x changed\n" << DNB(x) << "\n";
-        }
-    }
-    cout << DNB(x);
-    return x;
-}
 
-//SIGNED VERSION
-long long reverseBits (long long x)
-{
-    for(unsigned i = 0, j = 62; i < j; ++i, --j)
-    {
-        //cout << i << " " << j << endl;
-        if ( (x>>i & 1) != (x>>j & 1))
-        {
-            long long mask = (1LL<<i) | (1LL<<j);
-            //cout << "   " << DNB(mask) << endl ;
-            x ^= mask;
-            //cout << "x changed\n" << DNB(x) << "\n";
-        }
-    }
-    return x;
-}
-
-//IMPROVED VERSION : CREATING ONE MASK THEN XOR WITH X
-long long reverseBitsImproved (long long x)
+//SIGNED VERSION : CREATING ONE MASK THEN XOR WITH X
+long long reverse_kBits_Signed (long long x, const unsigned k)
 {
     long long mask = 0LL;
-    for(unsigned i = 0, j = 62; i < j; ++i, --j)
+    for(unsigned i = 0, j = k-2; i < j; ++i, --j)
     {
-        //cout << i << " " << j << endl;
+        //std::cout << i << " " << j << endl;
         if ( (x>>i & 1) != (x>>j & 1))
         {
             mask |= (1LL<<i) | (1LL<<j);
-            //cout << "   " << DNB(mask) << endl ;
-            //cout << "x changed\n" << DNB(x) << "\n";
+            //std::cout << "   " << DNB(mask) << endl ;
+            //std::cout << "x changed\n" << DNB(x) << "\n";
         }
     }
     x ^= mask;
