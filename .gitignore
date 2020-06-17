@@ -1,13 +1,10 @@
-.vscode/ipch/663054b42a9f6757/5-1.ipch
-.vscode/ipch/23b277aff6b0160d/mmap_address.bin
-.vscode/ipch/23b277aff6b0160d/5-3.ipch
-.vscode/ipch/a07902a383e9f486/5-2.ipch
-.vscode/ipch/a07902a383e9f486/mmap_address.bin
-.vscode/ipch/ddca18cfd60ebc13/mmap_address.bin
-.vscode/ipch/663054b42a9f6757/mmap_address.bin
-
 .vscode/*
 
 *.exe
 
 *.obj
+
+*.gitignore
+
+*.code-workspace
+
