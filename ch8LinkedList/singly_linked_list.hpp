@@ -20,9 +20,9 @@ template <typename T>
 class LinkedList
 {
 public:
-    LinkedList(std::vector<T> stream)
+    LinkedList(const vector<T> &stream)
     {
-        for (T i : stream)
+        for (const T &i : stream)
             insert(i);
     }
 
@@ -39,7 +39,7 @@ public:
             trav = nextNodePtr;
         }
     }
-    void insert(T data)
+    void insert(const T &data)
     {
         SLL_Node<T> *n = new SLL_Node<T>(data);
         if (!head)
@@ -56,7 +56,7 @@ public:
 };
 
 template <typename T>
-void print_singly_linked_list(SLL_Node<T> *head)
+void print_singly_linked_list(SLL_Node<T> *&head)
 {
     if (!head)
     {

@@ -48,6 +48,20 @@ public:
             push_back(i);
         }
     }
+
+    ~DoublyLinkedList()
+    {
+        if (!head)
+            return;
+
+        DLL_Node<T> *trav = head, *nextNodePtr = nullptr;
+        while (trav)
+        {
+            nextNodePtr = trav->next;
+            delete trav;
+            trav = nextNodePtr;
+        }
+    }
 };
 
 template <typename T>
