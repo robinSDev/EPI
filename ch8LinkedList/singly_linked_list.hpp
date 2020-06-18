@@ -3,6 +3,8 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <unordered_set>
+using std::unordered_set;
 using std::cout;
 using std::endl;
 using std::vector;
@@ -12,7 +14,7 @@ struct SLL_Node
 {
     T data;
     SLL_Node *next;
-    SLL_Node(int d) { data = d; }
+    SLL_Node(int d) { data = d; next = nullptr;}
     SLL_Node() { next = nullptr; }
 };
 
@@ -27,13 +29,14 @@ public:
     }
 
     ~LinkedList()
-    {
+    {   //hash set for those lists which contain cycle
         if (!head)
             return;
-
+        unordered_set<SLL_Node<T>*> set_of_ptrs;
         SLL_Node<T> *trav = head, *nextNodePtr = nullptr;
-        while (trav)
+        while (trav and set_of_ptrs.find(trav) == set_of_ptrs.end())
         {
+            set_of_ptrs.insert(trav);
             nextNodePtr = trav->next;
             delete trav;
             trav = nextNodePtr;
@@ -48,7 +51,6 @@ public:
         {
             tail->next = n;
             tail = n;
-            tail->next = nullptr;
         }
     }
 
