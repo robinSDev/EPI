@@ -14,6 +14,7 @@ struct SLL_Node
 {
     T data;
     SLL_Node *next;
+    SLL_Node(int d, SLL_Node<T> *ptr) { data = d; next = ptr;}
     SLL_Node(int d) { data = d; next = nullptr;}
     SLL_Node() { next = nullptr; }
 };
