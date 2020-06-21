@@ -1,5 +1,3 @@
-// https://github.com/adnanaziz/epicode/blob/master/cpp/valid-parentheses.cc
-
 #include <cassert>
 #include <iostream>
 #include <stack>
