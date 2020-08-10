@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <iterator>
 #include <random>
 #include <string>
 #include <unordered_map>
